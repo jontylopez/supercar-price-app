@@ -29,7 +29,7 @@ supercar-price-app/
 
 ```bash
 # Windows
-python -m venv venv
+py -m venv venv
 venv\Scripts\activate
 
 # macOS/Linux
@@ -54,7 +54,7 @@ The app will open in your browser at `http://localhost:8501`
 ### 4. Run Batch CLI
 
 ```bash
-python predict_batch.py --input supercars_test.csv --output predictions.csv
+py predict_batch.py --input supercars_test.csv --output predictions.csv
 ```
 
 ### 5. Demo Real Data
@@ -64,6 +64,7 @@ python demo_real_data.py
 ```
 
 **Note:** The project includes real supercar data:
+
 - `supercars_train.csv` - Training data with prices (2002 cars)
 - `supercars_test.csv` - Test data for predictions (502 cars)
 
@@ -72,12 +73,14 @@ python demo_real_data.py
 ### Streamlit App
 
 **Tab 1: Single Car Prediction**
+
 - Form inputs for all car specifications
 - Real-time price prediction
 - Car summary display
 - Handles missing data gracefully
 
 **Tab 2: Batch CSV Prediction**
+
 - Upload CSV files for bulk predictions
 - Preview first 20 predictions
 - Price distribution visualization
@@ -95,11 +98,13 @@ python demo_real_data.py
 The model expects these columns (order doesn't matter):
 
 **Numeric Features:**
+
 - `year`, `horsepower`, `torque`, `weight_kg`, `zero_to_60_s`, `top_speed_mph`
 - `num_doors`, `mileage`, `num_owners`, `warranty_years`
 - `damage_cost`, `damage`
 
 **Categorical Features:**
+
 - `brand` (McLaren, Ferrari, Lamborghini, Bugatti, Aston Martin, Pagani, Koenigsegg)
 - `color` (Black, White, Red, Blue, Green, Yellow, Orange, Silver)
 - `engine_config` (V8, V10, V12, W16, Hybrid, Electric)
@@ -113,10 +118,12 @@ The model expects these columns (order doesn't matter):
 - `model`, `damage_type`
 
 **Boolean Features:**
+
 - `carbon_fiber_body`, `aero_package`, `limited_edition`
 - `has_warranty`, `non_original_parts`
 
 **Date Features:**
+
 - `last_service_date` (YYYY-MM-DD format)
 
 ## 🔧 Configuration
@@ -124,6 +131,7 @@ The model expects these columns (order doesn't matter):
 ### Model Artifacts
 
 Place these files in the project root:
+
 - `preprocessor.joblib` - Feature preprocessing pipeline
 - `supercar_mlp.keras` - Trained neural network model
 - `feature_columns.json` - Feature column definitions
@@ -186,14 +194,17 @@ assert price > 1000, "Price should be greater than $1000"
 ### Common Issues
 
 1. **Model artifacts not found**
+
    - Ensure `preprocessor.joblib`, `supercar_mlp.keras`, and `feature_columns.json` are in the project root
    - Check file permissions
 
 2. **Import errors**
+
    - Verify virtual environment is activated
    - Reinstall requirements: `pip install -r requirements.txt`
 
 3. **Memory issues**
+
    - The app uses CPU-only TensorFlow by default
    - For large datasets, consider using the CLI instead of Streamlit
 
@@ -213,4 +224,4 @@ This project is part of the "Predict Supercars Prices 2025" assignment.
 
 ## 🤝 Contributing
 
-This is a standalone prediction app. For model training or modifications, refer to the main project repository. 
+This is a standalone prediction app. For model training or modifications, refer to the main project repository.
