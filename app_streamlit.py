@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from utils.infer import load_artifacts, predict_df, predict_single_row
+import os
+from utils.infer import load_artifacts, predict_df, predict_single_row, load_xgb_model
 import io
 
 # Page config
@@ -15,17 +16,49 @@ st.set_page_config(
 @st.cache_resource
 def get_artifacts():
     try:
-        return load_artifacts()
+        # Try to load new blended model first
+        new_model_path = "new model files"
+        if os.path.exists(os.path.join(new_model_path, "blend_config.json")):
+            preprocessor, model, num_cols, cat_cols, blend_config = load_artifacts(
+                pre_path=os.path.join(new_model_path, "preprocessor.joblib"),
+                model_path=os.path.join(new_model_path, "supercar_mlp.keras"),
+                cols_path=os.path.join(new_model_path, "feature_columns.json"),
+                blend_config_path=os.path.join(new_model_path, "blend_config.json")
+            )
+            
+            # Try to load XGBoost model
+            xgb_model = None
+            xgb_path = os.path.join(new_model_path, "supercar_xgb.model")
+            if os.path.exists(xgb_path):
+                xgb_model = load_xgb_model(xgb_path)
+            
+            return preprocessor, model, num_cols, cat_cols, blend_config, xgb_model
+        else:
+            # Fall back to original model
+            return load_artifacts() + (None, None)
     except Exception as e:
         st.error(f"Error loading artifacts: {e}")
-        return None, None, None, None
+        return None, None, None, None, None, None
 
 # Load artifacts
-preprocessor, model, num_cols, cat_cols = get_artifacts()
+artifacts = get_artifacts()
+if len(artifacts) == 6:
+    preprocessor, model, num_cols, cat_cols, blend_config, xgb_model = artifacts
+else:
+    preprocessor, model, num_cols, cat_cols = artifacts[:4]
+    blend_config, xgb_model = None, None
 
 if preprocessor is None:
     st.error("Failed to load model artifacts. Please ensure preprocessor.joblib, supercar_mlp.keras, and feature_columns.json are in the project root.")
     st.stop()
+
+# Show model info
+if blend_config:
+    st.sidebar.success("🚀 Using Blended XGBoost + MLP Model")
+    st.sidebar.info(f"MLP Weight: {blend_config['weights']['W_MLP']:.1%}")
+    st.sidebar.info(f"XGBoost Weight: {blend_config['weights']['W_XGB']:.1%}")
+else:
+    st.sidebar.info("📊 Using MLP Model Only")
 
 # Define all expected columns
 ALL_COLUMNS = [
@@ -171,7 +204,7 @@ def main():
                 
                 try:
                     # Make prediction
-                    predicted_price = predict_single_row(car_data, preprocessor, model, num_cols, cat_cols)
+                    predicted_price = predict_single_row(car_data, preprocessor, model, num_cols, cat_cols, blend_config, xgb_model)
                     
                     # Display result
                     st.success("🎯 Prediction Complete!")
@@ -240,7 +273,7 @@ def main():
                                         df[col] = 0
                             
                             # Make predictions
-                            predictions_df = predict_df(df, preprocessor, model, num_cols, cat_cols)
+                            predictions_df = predict_df(df, preprocessor, model, num_cols, cat_cols, blend_config, xgb_model)
                             
                             # Create output DataFrame
                             if 'id' in df.columns:

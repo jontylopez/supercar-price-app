@@ -1,0 +1,13 @@
+{
+  "has_xgb": true,
+  "weights": {
+    "W_MLP": 0.5,
+    "W_XGB": 0.5
+  },
+  "calibration": {
+    "a": 1.0477100610733032,
+    "b": 74154.375
+  },
+  "clip_floor": 1000.0,
+  "notes": "Predict log with both models, blend in log-space, then price = a*expm1(log_blend)+b; clip to >= clip_floor."
+}

@@ -3,4 +3,5 @@ pandas>=2.0
 numpy>=1.24,<2.3
 scikit-learn>=1.2,<1.6
 joblib>=1.2
-tensorflow-cpu>=2.14,<2.17 
+tensorflow-cpu>=2.14,<2.17
+xgboost>=1.7 
